@@ -1,0 +1,98 @@
+:root {
+    --background: #FFF;
+    --button: linear-gradient(180deg, #E4E4E4 0%, #F7F7F7 100%);
+    --invalid: #BF0E0E;
+    --accent: #4E9590;
+    --brackets: #F2CAB8;
+    --black: #000;
+    --gray: #BFBFBF;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+}
+
+h1 {
+    font-size: 3rem;
+}
+
+h2 {
+    font-size: 2.5rem;
+}
+
+button {
+    padding: 6px 12px;
+    background: var(--button);
+    border: 1px solid var(--black);
+    border-radius: 5px;
+    font-size: 1rem;
+    opacity: 0.7;
+}
+
+button:active {
+    filter: brightness(0.95);
+}
+
+#error {
+    font-size: 1rem;
+    color: var(--invalid);
+}
+
+/* Pages */
+.home {
+    margin: 30vh 0;
+    text-align: center;
+}
+
+.home p {
+    font-size: 1.25rem;
+}
+
+.viewer {
+    margin: 5vh auto;
+    width: fit-content;
+}
+
+/* JSON elements */
+.key {
+    color: var(--accent);
+}
+
+dt, .index {
+    color: var(--gray);
+}
+
+dl {
+    margin: 0;
+}
+
+dd {
+    padding-left: 20px;
+    margin-inline-start: 2px;
+    border-left: 1px solid var(--gray);
+}
+
+dd.noline {
+    padding-left: 0;
+    margin-inline-start: 0;
+    border-left: none;
+}
+
+dl dt {
+    color: var(--gray);
+}
+
+dl.array > dt::after {
+    margin-left: 0.25rem;
+    content: "[";
+    color: var(--brackets);
+}
+
+dl.array::after {
+    content: "]";
+    color: var(--brackets);
+}
+
+.brackets {
+    color: var(--brackets);
+}

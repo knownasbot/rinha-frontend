@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <title>Sick JSON Viewer</title>
+</head>
+<body>
+    <div class="root">
+        <div class="home">
+            <h1>Sick JSON Viewer</h1>
+            <p>Simple JSON Viewer that runs completely on-client. No data exchange </p>
+            <button id="load">Load JSON</button>
+            <p id="error" hidden>Invalid file. Please load a valid JSON file.</p>
+        </div>
+
+        <div class="viewer" hidden>
+            <!-- Botão temporário xd -->
+            <span onclick="window.history.back()" style="cursor: pointer;">&lt; go back</span>
+
+            <h2>file.json</h2>
+            
+            <div id="data"></div>
+        </div>
+    </div>
+
+    <input type="file" id="file" accept=".json,.txt" hidden>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
