@@ -3,14 +3,14 @@
  * @param {{
  *  title?: string;
  *  values: any[];
- *  depth?: number;
+ *  first?: boolean;
  * }} props Propriedades do elemento.
  * @returns {HTMLDListElement} Elemento
  */
 export function ArrayNode({
     title,
     values,
-    depth = 0
+    first
 }) {
     const element = document.createElement("dl");
     element.classList.add("array");
@@ -18,7 +18,7 @@ export function ArrayNode({
     const arrayTitle = document.createElement("dt");
     let titleContent = title ? title + ":" : "";
 
-    if (depth === 0) {
+    if (first) {
         const key = document.createElement("span");
         key.classList.add("key");
         key.append(titleContent);
@@ -43,8 +43,7 @@ export function ArrayNode({
         } else if (Array.isArray(v)) {
             v = ArrayNode({
                 title: i,
-                values: v,
-                depth: depth + 1
+                values: v
             });
         } else if (typeof v === "object" && v) {
             const key = document.createElement("span");
@@ -95,7 +94,7 @@ export function ObjectNode({ value, line = true }) {
             v = ArrayNode({
                 title: k,
                 values: v,
-                depth: 0
+                first: true
             });
         } else if (typeof v === "object" && v) {
             v = ObjectNode({
