@@ -29,37 +29,35 @@ export function ArrayNode({
     arrayTitle.append(titleContent);
     element.append(arrayTitle);
 
-    element.append(
-        ...values.map((v, i) => {
-            const dd = document.createElement("dd");
+    for (let i = 0; i < values.length; i++) {
+        let v = values[i];
+        const dd = document.createElement("dd");
 
-            if (typeof v === "string") {
-                const key = document.createElement("span");
-                key.classList.add("index");
-                key.append(i + ": ");
-                dd.append(key);
+        if (typeof v === "string") {
+            const key = document.createElement("span");
+            key.classList.add("index");
+            key.append(i + ": ");
+            dd.append(key);
 
-                v = `"${v}"`;
-            } else if (Array.isArray(v)) {
-                v = ArrayNode({
-                    title: i,
-                    values: v,
-                    depth: depth + 1
-                });
-            } else if (typeof v === "object" && v) {
-                const key = document.createElement("span");
-                key.classList.add("index");
-                key.append(i + ": ");
-                dd.append(key);
+            v = `"${v}"`;
+        } else if (Array.isArray(v)) {
+            v = ArrayNode({
+                title: i,
+                values: v,
+                depth: depth + 1
+            });
+        } else if (typeof v === "object" && v) {
+            const key = document.createElement("span");
+            key.classList.add("index");
+            key.append(i + ": ");
+            dd.append(key);
 
-                v = ObjectNode({ value: v });
-            }
+            v = ObjectNode({ value: v });
+        }
 
-            dd.append(v);
-
-            return dd;
-        })
-    );
+        dd.append(v);
+        element.append(dd);
+    }
 
     return element;
 }
