@@ -1,110 +1,202 @@
+let nodeCount = 0;
+let maxNodeCount = 127;
+
+let depth = 0;
+let lastDepth;
+let lastObjectEndDepth;
+let refresh = false;
+
 /**
- * Array JSON.
- * @param {{
- *  title?: string;
- *  values: any[];
- *  first?: boolean;
- * }} props Propriedades do elemento.
- * @returns {HTMLDListElement} Elemento
+ * Define a quantidade atual de nós renderizados.
+ * @param {number} n Quantidade
+ * @param {boolean} newChunk Se é um novo pedaço a ser renderizado
  */
-export function ArrayNode({
-    title,
-    values,
-    first
-}) {
-    const element = document.createElement("dl");
-    element.classList.add("array");
-    
-    const arrayTitle = document.createElement("dt");
-    let titleContent = title ? title + ":" : "";
-
-    if (first) {
-        const key = document.createElement("span");
-        key.classList.add("key");
-        key.append(titleContent);
-
-        titleContent = key;
-    }
-
-    arrayTitle.append(titleContent);
-    element.append(arrayTitle);
-
-    for (let i = 0; i < values.length; i++) {
-        let v = values[i];
-        const dd = document.createElement("dd");
-
-        if (typeof v === "string") {
-            const key = document.createElement("span");
-            key.classList.add("index");
-            key.append(i + ": ");
-            dd.append(key);
-
-            v = `"${v}"`;
-        } else if (Array.isArray(v)) {
-            v = ArrayNode({
-                title: i,
-                values: v
-            });
-        } else if (typeof v === "object" && v) {
-            const key = document.createElement("span");
-            key.classList.add("index");
-            key.append(i + ": ");
-            dd.append(key);
-
-            v = ObjectNode({ value: v });
-        }
-
-        dd.append(v);
-        element.append(dd);
-    }
-
-    return element;
+export function setNodeCount(n, newChunk) {
+    nodeCount = n;
+    lastDepth = depth;
+    depth = 0;
+    refresh = newChunk;
 }
 
 /**
- * Objeto JSON.
- * @param {{
- *  value: {
- *   [s: string]: any;
- *  };
- *  line: boolean;
- * }} value Objeto
- * @returns {HTMLDListElement} Elemento
+ * Adiciona elementos de tabulação no elemento alvo.
+ * @param {HTMLElement} target Elemento alvo
  */
-export function ObjectNode({ value, line = true }) {
-    const element = document.createElement("dl");
+export function applyTab(target) {
+    for (let i = 0; i < depth; i++) {
+        target.append(document.createElement("tab"));
+    }
+}
 
-    for (let [ k, v ] of Object.entries(value)) {
-        const dd = document.createElement("dd");
+/**
+ * Valor de uma array.
+ * @param {number} index Índice
+ * @param {any} value Valor
+ * @param {string} startWithSymbol Se o valor deve iniciar com o simbolo especificado
+ */
+export function ArrayValue(index, value, startWithSymbol) {
+    const li = document.createElement("li");
+    const idx = document.createElement("span");
+    idx.classList.add("index");
+    idx.innerText = index + ": "
 
-        if (!line) {
-            dd.classList.add("noline");
-        }
+    applyTab(li);
+    li.append(idx);
 
-        if (!Array.isArray(v)) {
-            const key = document.createElement("span");
-            key.classList.add("key");
-            key.append(k + ": ");
-            dd.append(key);
-        }
+    if (startWithSymbol) {
+        const arrayStart = document.createElement("span");
+        arrayStart.classList.add("brackets");
+        arrayStart.append(startWithSymbol);
+        li.append(arrayStart);
 
-        if (typeof v === "string") {
-            v = `"${v}"`;
-        } else if (Array.isArray(v)) {
-            v = ArrayNode({
-                title: k,
-                values: v,
-                first: true
-            });
-        } else if (typeof v === "object" && v) {
-            v = ObjectNode({
-                value: v
-            });
-        }
-
-        dd.append(v);
-        element.append(dd);
+        value = "";
+    } else if (typeof value == "string") {
+        value = `"${value}"`;
     }
 
-    return element;
+    li.append(value);
+
+    return li;
+}
+/**
+ * Valor de um objeto.
+ * @param {string} key Chave
+ * @param {any} value Valor
+ * @param {string} startWithSymbol Se o valor deve iniciar com o simbolo especificado
+ */
+export function ObjectValue(key, value, startWithSymbol) {
+    const li = document.createElement("li");
+    const k = document.createElement("span");
+    k.classList.add("key");
+    k.innerText = key + ": "
+
+    applyTab(li);
+    li.append(k);
+
+    if (startWithSymbol) {
+        const objectStart = document.createElement("span");
+        objectStart.classList.add("brackets");
+        objectStart.append(startWithSymbol);
+        li.append(objectStart);
+
+        value = "";
+    } else if (typeof value == "string") {
+        value = `"${value}"`;
+    }
+
+    li.append(value);
+
+    return li;
+}
+
+/**
+ * Renderiza o JSON como elementos.
+ * @param {HTMLOListElement} target Elemento alvo
+ * @param {any} value Valor do JSON 
+ */
+export function renderJSON(target, value) {
+    debugger;
+    if (nodeCount >= maxNodeCount ||
+        depth == 0 && (
+            (Array.isArray(value) && value.length < 1) ||
+            typeof value == "object" && Object.keys(value).length < 1))
+        return;
+
+    if (depth == lastDepth && refresh) {
+        refresh = false;
+    }
+
+    if (Array.isArray(value)) {
+        if (depth < 1 && !refresh) {
+            const arrayStart = document.createElement("li");
+            arrayStart.classList.add("brackets");
+
+            applyTab(arrayStart);
+            arrayStart.append("[");
+            target.append(arrayStart);
+        }
+
+        depth++;
+
+        for (let i in value) {
+            const v = value[i];
+
+            if (v == null || typeof v != "object") {
+                if (!refresh) {
+                    target.append(ArrayValue(i, v));
+                }
+            } else {
+                if (!refresh) {
+                    target.append(ArrayValue(i, null, Array.isArray(v) ? "[" : "{"));
+                }
+
+                renderJSON(target, v);
+
+                if (nodeCount >= maxNodeCount) return;
+            }
+
+            delete value[i];
+        }
+
+        depth--;
+
+        if (!refresh && "]" + depth != lastObjectEndDepth) {
+            const arrayEnd = document.createElement("li");
+            arrayEnd.classList.add("brackets");
+            applyTab(arrayEnd);
+            arrayEnd.append("]");
+            target.append(arrayEnd);
+
+            lastObjectEndDepth = "]" + depth;
+        }
+    } else if (typeof value == "object") {
+        if (depth < 1 && !refresh) {
+            const objectStart = document.createElement("li");
+            objectStart.classList.add("brackets");
+
+            applyTab(objectStart);
+            objectStart.append("{");
+            target.append(objectStart);
+        }
+
+        depth++;
+
+        for (let [ k, v ] of Object.entries(value)) {
+            if (v == null || typeof v != "object") {
+                if (!refresh) {
+                    target.append(ObjectValue(k, v));
+                }
+            } else {
+                if (!refresh) {
+                    target.append(ObjectValue(k, null, Array.isArray(v) ? "[" : "{"));
+                }
+
+                renderJSON(target, v);
+
+                if (nodeCount >= maxNodeCount) return;
+            }
+
+            delete value[k];
+        }
+
+        depth--;
+
+        if (!refresh && "}" + depth != lastObjectEndDepth) { 
+            const objectEnd = document.createElement("li");
+            objectEnd.classList.add("brackets");
+            applyTab(objectEnd);
+            objectEnd.append("}");
+            target.append(objectEnd);
+
+            lastObjectEndDepth = "}" + depth;
+        }
+    } else {
+        const li = document.createElement("li");
+
+        applyTab(li);
+        li.append(typeof value == "string" ? `"${value}"` : value);
+        target.append(li);
+    }
+    
+    nodeCount++;
 }

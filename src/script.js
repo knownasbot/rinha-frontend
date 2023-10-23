@@ -1,4 +1,4 @@
-import { ArrayNode, ObjectNode } from "./components.js";
+import { renderJSON, setNodeCount } from "./components.js";
 
 const home = document.querySelector(".home");
 const viewer = document.querySelector(".viewer");
@@ -8,6 +8,9 @@ const fileTitle = viewer.querySelector("h2");
 const fileSelector = document.querySelector("input#file");
 const loadButton = home.querySelector("button#load");
 const errorText = home.querySelector("p#error");
+
+let mainNode;
+let currentJSON;
 
 loadButton.addEventListener("click", () => fileSelector.click());
 fileSelector.addEventListener("input", () => {
@@ -21,23 +24,17 @@ fileSelector.addEventListener("input", () => {
     file
         .text()
         .then((result) => {
+            mainNode = document.createElement("ol");
+            root.append(mainNode);
+
             try {
-                const json = JSON.parse(result);
+                currentJSON = JSON.parse(result);
 
                 home.hidden = true;
                 viewer.hidden = false;
 
-                root.append(
-                    Array.isArray(json) ?
-                    ArrayNode({
-                        values: json
-                    })
-                    :
-                    ObjectNode({
-                        value: json,
-                        line: false
-                    })
-                );
+                setNodeCount(0);
+                renderJSON(mainNode, currentJSON);
             } catch {
                 errorText.hidden = false;
             }
@@ -50,4 +47,13 @@ window.addEventListener("popstate", () => {
     home.hidden = false;
     viewer.hidden = true;
     errorText.hidden = true;
+
+    fileSelector.value = null;
+});
+
+window.addEventListener("scroll", () => {
+    if (!viewer.hidden && window.scrollY >= document.body.scrollHeight * 0.8) {
+        setNodeCount(0, true);
+        renderJSON(mainNode, currentJSON);
+    }
 });

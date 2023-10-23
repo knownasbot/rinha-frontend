@@ -9,4 +9,5 @@ Ainda em desenvolvimento, não espere um código bonito.
 - [x] Elementos de nós JSON
 - [x] Carregamento de arquivos
 - [ ] Otimizar análise do JSON
+- [ ] Arrumar exibição de arrays/objetos vazios
 - [ ] Analisar necessidade de refatoramento no código
