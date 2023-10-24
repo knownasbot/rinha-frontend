@@ -51,6 +51,8 @@ button:active {
 .viewer {
     margin: 5vh auto;
     width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
 }
 
 /* JSON elements */
