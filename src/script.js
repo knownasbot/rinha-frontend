@@ -17,7 +17,7 @@ fileSelector.addEventListener("input", () => {
     window.history.pushState("json", null, "/");
 
     const file = fileSelector.files.item(0);
-    fileTitle.lastChild.innerText = file.name;
+    fileTitle.lastChild.textContent = " " + file.name;
 
     errorText.hidden = true;
 
