@@ -109,6 +109,8 @@ export function renderJSON(target, value) {
         refresh = false;
     }
 
+    let isNodeEmpty = true;
+
     if (Array.isArray(value)) {
         if (depth < 1 && !refresh) {
             const arrayStart = document.createElement("li");
@@ -123,6 +125,8 @@ export function renderJSON(target, value) {
 
         for (let i in value) {
             const v = value[i];
+
+            isNodeEmpty = false;
 
             if (v == null || typeof v != "object") {
                 if (!refresh) {
@@ -144,12 +148,17 @@ export function renderJSON(target, value) {
         depth--;
 
         if (!refresh && "]" + depth != lastObjectEndDepth) {
-            const arrayEnd = document.createElement("li");
+            const arrayEnd = document.createElement(isNodeEmpty ? "span" : "li");
             arrayEnd.classList.add("brackets");
-            applyTab(arrayEnd);
-            arrayEnd.append("]");
-            target.append(arrayEnd);
 
+            if (isNodeEmpty) {
+                target.lastChild.append(" ", arrayEnd);
+            } else {
+                applyTab(arrayEnd);
+                target.append(arrayEnd);
+            }
+
+            arrayEnd.append("]");
             lastObjectEndDepth = "]" + depth;
         }
     } else if (typeof value == "object") {
@@ -165,6 +174,8 @@ export function renderJSON(target, value) {
         depth++;
 
         for (let [ k, v ] of Object.entries(value)) {
+            isNodeEmpty = false;
+
             if (v == null || typeof v != "object") {
                 if (!refresh) {
                     target.append(ObjectValue(k, v));
@@ -185,12 +196,17 @@ export function renderJSON(target, value) {
         depth--;
 
         if (!refresh && "}" + depth != lastObjectEndDepth) { 
-            const objectEnd = document.createElement("li");
+            const objectEnd = document.createElement(isNodeEmpty ? "span" : "li");
             objectEnd.classList.add("brackets");
-            applyTab(objectEnd);
-            objectEnd.append("}");
-            target.append(objectEnd);
 
+            if (isNodeEmpty) {
+                target.lastChild.append(" ", objectEnd);
+            } else {
+                applyTab(objectEnd);
+                target.append(objectEnd);
+            }
+
+            objectEnd.append("}");
             lastObjectEndDepth = "}" + depth;
         }
     } else {
