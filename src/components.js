@@ -56,6 +56,8 @@ export function ArrayValue(index, value, startWithSymbol) {
 
     li.append(value);
 
+    lastObjectEndDepth = null;
+
     return li;
 }
 /**
@@ -86,6 +88,8 @@ export function ObjectValue(key, value, startWithSymbol) {
 
     li.append(value);
 
+    lastObjectEndDepth = null;
+
     return li;
 }
 
@@ -95,7 +99,6 @@ export function ObjectValue(key, value, startWithSymbol) {
  * @param {any} value Valor do JSON 
  */
 export function renderJSON(target, value) {
-    debugger;
     if (nodeCount >= maxNodeCount ||
         depth == 0 && (
             (Array.isArray(value) && value.length < 1) ||
